@@ -1,3 +1,4 @@
+
 def map_policy(policy):
     return {
         "table_fqn": policy[0],
@@ -18,10 +19,12 @@ def get_policies(ds=None):
 
 
 @dag(
+    'ttl_dag',
     start_date=pendulum.datetime(2021, 11, 19, tz="UTC"),
     schedule="@daily",
     catchup=False,
 )
+#dag = DAG('ttl_dag', default_args=default_args, schedule_interval=None)
 def data_retention_delete():
     SQLExecuteQueryOperator.partial(
         task_id="delete_partition",
