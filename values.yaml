@@ -79,8 +79,8 @@ airflowVersion: "2.7.1"
 # Images
 images:
   airflow:
-    repository: ~
-    tag: ~
+    repository: europe-west4-docker.pkg.dev/searce-practice-data-analytics/airflow-gke/airflow-plugins-dependencies
+    tag: 1.0.0
     # Specifying digest takes precedence over tag.
     digest: ~
     pullPolicy: IfNotPresent
@@ -1018,7 +1018,6 @@ migrateDatabaseJob:
       exec \
 
       airflow {{ semverCompare ">=2.7.0" .Values.airflowVersion
-      | ternary "db migrate" (semverCompare ">=2.0.0" .Values.airflowVersion
       | ternary "db upgrade" "upgradedb") }}
 
   # Annotations on the database migration pod
@@ -2367,15 +2366,15 @@ dags:
     # git repo clone url
     # ssh example: git@github.com:apache/airflow.git
     # https example: https://github.com/apache/airflow.git
-    repo: https://github.com/apache/airflow.git
-    branch: v2-2-stable
+    repo: https://github.com/Rajasuryaa-Palanisamy/airflow_gke.git
+    branch: master
     rev: HEAD
     depth: 1
     # the number of consecutive failures allowed before aborting
     maxFailures: 0
     # subpath within the repo where dags are located
     # should be "" if dags are at repo root
-    subPath: "tests/dags"
+    subPath: "dags"
     # if your repo needs a user name password
     # you can load them to a k8s secret like the one below
     #   ---
