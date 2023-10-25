@@ -79,8 +79,8 @@ airflowVersion: "2.7.1"
 # Images
 images:
   airflow:
-    repository: europe-west4-docker.pkg.dev/searce-practice-data-analytics/airflow-gke/airflow-plugins-dependencies
-    tag: 1.0.0
+    repository: ~
+    tag: ~
     # Specifying digest takes precedence over tag.
     digest: ~
     pullPolicy: IfNotPresent
@@ -1018,7 +1018,8 @@ migrateDatabaseJob:
       exec \
 
       airflow {{ semverCompare ">=2.7.0" .Values.airflowVersion
-      | ternary "db upgrade" "upgradedb" }}
+      | ternary "db migrate" (semverCompare ">=2.0.0" .Values.airflowVersion
+      | ternary "db upgrade" "upgradedb") }}
 
   # Annotations on the database migration pod
   annotations: {}
