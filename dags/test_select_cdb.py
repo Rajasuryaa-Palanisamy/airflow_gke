@@ -19,7 +19,7 @@ from airflow.operators.empty import EmptyOperator
 @task
 def get_policies():
    SQLExecuteQueryOperator(
-            task_id=f"copy_{export_table['table']}",
+            task_id="test_cdb_con",
             conn_id="cratedb_connection",
             sql="""
                     select count(*) from keywords_partitioned;
