@@ -29,11 +29,11 @@ def get_policies():
     schedule="@daily",
     catchup=False,
 )
-def data_retention_delete():
+def data_retention_delete_test():
     start = EmptyOperator(task_id="start")
     end = EmptyOperator(task_id="end")
     tg1 = get_policies()
 
 
 
-data_retention_delete()
+data_retention_delete_test()
