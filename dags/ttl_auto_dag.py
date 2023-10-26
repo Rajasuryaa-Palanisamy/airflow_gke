@@ -6,6 +6,7 @@ from airflow import models
 from airflow.models import TaskInstance
 from airflow.utils.dates import days_ago
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
 def map_policy(policy):
     return {
