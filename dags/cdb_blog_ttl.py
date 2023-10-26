@@ -27,9 +27,16 @@ def map_policy(policy):
 def get_policies(ds=None):
     """Retrieve all partitions effected by a policy"""
     pg_hook = PostgresHook(postgres_conn_id="cratedb_connection")
-    sql = Path("include/data_retention_retrieve_delete_policies.sql")
+    #sql = Path("include/data_retention_retrieve_delete_policies.sql")
     return pg_hook.get_records(
-        sql=sql.read_text(encoding="utf-8"),
+        sql=""" SELECT QUOTE_IDENT(p.table_schema) || '.' || QUOTE_IDENT(p.table_name),
+       QUOTE_IDENT(r.partition_column),
+       TRY_CAST(p.values[r.partition_column] AS BIGINT)
+FROM information_schema.table_partitions p
+JOIN doc.retention_policies r ON p.table_schema = r.table_schema
+  AND p.table_name = r.table_name
+  AND p.values[r.partition_column] < %(day)s::TIMESTAMP - (r.retention_period || ' days')::INTERVAL
+WHERE r.strategy = 'delete'; """,
         parameters={"day": ds},
     )
 
