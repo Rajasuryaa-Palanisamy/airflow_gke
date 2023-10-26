@@ -2,6 +2,8 @@ from airflow import DAG
 from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
+from airflow import models
+from airflow.models import TaskInstance
 
 def map_policy(policy):
     return {
@@ -21,7 +23,7 @@ def get_policies(ds=None):
 
 
 default_args = {
-    'owner': 'Simmons',
+    'owner': 'npd',
     'depends_on_past': False,
     'email_on_failure': False,
     'email_on_retry': False,
@@ -42,20 +44,19 @@ with models.DAG(
     start_date= days_ago(1),
     schedule_interval=None, 
     catchup=False,
-    default_args=default_args,
-    on_success_callback=send_success_email,
+    default_args=default_args
 ) as dag:
 
 
     start = DummyOperator(task_id='start', dag=dag)
 
 
-    task1 = PythonOperator(
-        task_id='task1',
+    data_retention_delete_tsk = PythonOperator(
+        task_id='data_retention_delete_tsk',
         python_callable=data_retention_delete,
         dag=dag,
     )
 
     end = DummyOperator(task_id='end', dag=dag)
 
-    start >> task1  >> end
+    start >> data_retention_delete_tsk  >> end
