@@ -1,3 +1,7 @@
+from airflow import DAG
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
+from datetime import datetime
 
 def map_policy(policy):
     return {
@@ -6,8 +10,6 @@ def map_policy(policy):
         "value": policy[2],
     }
 
-
-@task
 def get_policies(ds=None):
     """Retrieve all partitions effected by a policy"""
     pg_hook = PostgresHook(postgres_conn_id="cratedb_connection")
@@ -18,13 +20,15 @@ def get_policies(ds=None):
     )
 
 
-@dag(
-    'ttl_dag',
-    start_date=pendulum.datetime(2021, 11, 19, tz="UTC"),
-    schedule="@daily",
-    catchup=False,
-)
-#dag = DAG('ttl_dag', default_args=default_args, schedule_interval=None)
+default_args = {
+    'owner': 'Simmons',
+    'depends_on_past': False,
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 0,
+    #'retry_delay': datetime.timedelta(minutes=5)
+}
+
 def data_retention_delete():
     SQLExecuteQueryOperator.partial(
         task_id="delete_partition",
@@ -33,4 +37,25 @@ def data_retention_delete():
     ).expand(params=get_policies().map(map_policy))
 
 
-data_retention_delete()
+with models.DAG(
+    'ttl_dag',
+    start_date= days_ago(1),
+    schedule_interval=None, 
+    catchup=False,
+    default_args=default_args,
+    on_success_callback=send_success_email,
+) as dag:
+
+
+    start = DummyOperator(task_id='start', dag=dag)
+
+
+    task1 = PythonOperator(
+        task_id='task1',
+        python_callable=data_retention_delete,
+        dag=dag,
+    )
+
+    end = DummyOperator(task_id='end', dag=dag)
+
+    start >> task1  >> end
