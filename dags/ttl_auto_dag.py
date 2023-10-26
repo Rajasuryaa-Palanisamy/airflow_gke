@@ -19,7 +19,7 @@ def map_policy(policy):
 def get_policies(ds=None):
     """Retrieve all partitions effected by a policy"""
     pg_hook = PostgresHook(postgres_conn_id="cratedb_connection")
-    sql = Path("sql/data_retention_delete.sql")
+    sql = Path("dags/sql/data_retention_delete.sql")
     return pg_hook.get_records(
         sql=sql.read_text(encoding="utf-8"),
         parameters={"day": ds},
