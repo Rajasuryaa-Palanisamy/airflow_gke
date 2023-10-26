@@ -4,6 +4,7 @@ from airflow.operators.python_operator import PythonOperator
 from datetime import datetime
 from airflow import models
 from airflow.models import TaskInstance
+from airflow.utils.dates import days_ago
 
 def map_policy(policy):
     return {
