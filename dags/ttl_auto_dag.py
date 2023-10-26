@@ -5,6 +5,7 @@ from datetime import datetime
 from airflow import models
 from airflow.models import TaskInstance
 from airflow.utils.dates import days_ago
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 def map_policy(policy):
     return {
