@@ -12,11 +12,11 @@ from pathlib import Path
 import pendulum
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.decorators import dag, task
+from airflow.decorators import dag, task_group
 from airflow.operators.empty import EmptyOperator
 
 
-@task
+@task_group
 def get_policies():
    SQLExecuteQueryOperator(
             task_id="test_cdb_con",
